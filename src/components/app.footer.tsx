@@ -1,5 +1,5 @@
 
-import React, { use } from 'react';
+import React from 'react';
 
 const AppFooter: React.FC = () => {
     return (
