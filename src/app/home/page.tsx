@@ -2,7 +2,6 @@
 import useSWR from 'swr';
 
 import AppTable from '@/components/app.table';
-import { Console } from 'console';
 
 
 export default function home() {
