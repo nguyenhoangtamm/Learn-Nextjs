@@ -2,18 +2,18 @@
 import useSWR from 'swr';
 
 import AppTable from '@/components/app.table';
+import { Console } from 'console';
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function home() {
-    const { data, error, isLoading } = useSWR(
-        'http://localhost:8000/blogs',
-        fetcher
-    );
-    if (isLoading) return <div>Loading...</div>;
+    const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-    return (
-       
-        <AppTable blog={data} />
-    )
+  const { data, error, isLoading } = useSWR(
+    'http://localhost:8000/blogs',
+    fetcher
+  );
+  if (isLoading) return <div>Loading...</div>;
+
+  console.log(isLoading);
+  return <AppTable blog={data.sort((a: any, b: any) => b.id - a.id)} />;
 }

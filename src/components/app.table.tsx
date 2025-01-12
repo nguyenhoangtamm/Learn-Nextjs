@@ -2,11 +2,16 @@
 import React, { useState } from 'react';
 import { Button, Table } from 'react-bootstrap';
 import CreateModal from './create.modal';
+import UpdateModal from './update.modal';
+import DeleteModal from './delete.modal';
+import Link from 'next/link';
+
 
 interface IBlog {
     id: number;
     title: string;
     author: string;
+    content: string;
 }
 
 interface Iprop {
@@ -16,9 +21,11 @@ interface Iprop {
 export default function AppTable(prop: Iprop) {
     const { blog } = prop;
     const [show, setShow] = useState<boolean>(false);
+    const [update, setUpdate] = useState<boolean>(false);
+    const [deleted , setDelete] = useState<boolean>(false);
 
-
-
+    const [rowdata, setRowData] = useState<IBlog|null>(null);
+        
     return (
         <>
             <div className='d-flex justify-content-between'>
@@ -36,14 +43,20 @@ export default function AppTable(prop: Iprop) {
                     </tr>
                 </thead>
                 <tbody>
-                    {blog.map((item, index) => (
+                    {blog.map((item) => (
                         <tr key={item.id}>
-                            <td>{index + 1}</td>
+                            <td>{item.id}</td>
                             <td>{item.title}</td>
                             <td>{item.author}</td>
                             <td>
-                                <Button variant="warning">Edit</Button>{' '}
-                                <Button variant="danger">Delete</Button>
+                           
+                        <Link className='btn btn-primary' href={`/blog/${item.id}`}>
+                        View
+                        </Link>
+
+                           
+                                <Button variant="warning" onClick={() => { setRowData(item); setUpdate(true); }}>Edit</Button>
+                                <Button variant="danger" onClick={()=>{setRowData(item); setDelete(true);}} >Delete</Button>
                             </td>
                         </tr>
                     ))}
@@ -53,6 +66,18 @@ export default function AppTable(prop: Iprop) {
             <CreateModal
                 showModalCreate={show}
                 setShowModalCreate={setShow}
+            />
+             <UpdateModal
+                showModalCreate={update}
+                setShowModalCreate={setUpdate}
+                blog={rowdata}
+                setBlog={setRowData}
+            />
+            <DeleteModal
+                showModalCreate={deleted}
+                setShowModalCreate={setDelete}
+                blog={rowdata}
+                setBlog={setRowData}
             />
         </>
     );

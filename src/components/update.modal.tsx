@@ -1,28 +1,43 @@
 'use client';
-import { useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import { toast } from 'react-toastify';
 import { mutate } from 'swr';
 
+
+
 interface Iprop {
   showModalCreate: boolean;
   setShowModalCreate: (show: boolean) => void;
+  blog: IBlog | null;
+  setBlog: (data: IBlog | null) => void;
 }
 
-function CreateModal(prop: Iprop) {
-  const { showModalCreate, setShowModalCreate } = prop;
+function UpdateModal(prop: Iprop) {
+  const { showModalCreate, setShowModalCreate, blog, setBlog } = prop;
+  const [id, setId] = useState<number>(0);
   const [Tile, setTitle] = useState<string>('');
   const [Content, setContent] = useState<string>('');
   const [Author, setAuthor] = useState<string>('');
+    console.log(id, Tile, Content, Author);
+  useEffect(() => {
+    if (blog && blog.id) {
+        setId(blog.id);
+      setTitle(blog.title);
+      setContent(blog.content);
+      setAuthor(blog.author);
+    }
+  }, [blog]);
+
   const handleSubmit = () => {
     if (!Tile || !Content || !Author) {
       toast.error('Please fill all fields');
       return;
     } else {
-      fetch('http://localhost:8000/blogs', {
-        method: 'POST',
+      fetch(`http://localhost:8000/blogs/${id}`, {
+        method: 'PUT',
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
@@ -30,18 +45,15 @@ function CreateModal(prop: Iprop) {
         body: JSON.stringify({
           title: Tile,
           content: Content,
-
           author: Author,
         }),
       })
-        .then(response => response.json())
-        .then(response => {
-          
-          toast.success('Blog added successfully');
-          console.log("respone"+response);
+        .then((response) => response.json())
+        .then((response) => {
+          toast.success('Blog update successfully');
+          console.log('respone' + response);
           handleClose();
           mutate('http://localhost:8000/blogs');
-          
         })
         .catch((error) => {
           toast.error('An error occurred');
@@ -54,6 +66,7 @@ function CreateModal(prop: Iprop) {
     setTitle('');
     setContent('');
     setAuthor('');
+    setBlog(null);
     setShowModalCreate(false);
   };
   return (
@@ -65,7 +78,7 @@ function CreateModal(prop: Iprop) {
         keyboard={false}
       >
         <Modal.Header closeButton>
-          <Modal.Title>Add Blog</Modal.Title>
+          <Modal.Title>Update Blog</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
@@ -73,7 +86,6 @@ function CreateModal(prop: Iprop) {
               <Form.Label>Title</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Enter title"
                 value={Tile}
                 onChange={(e) => setTitle(e.target.value)}
               />
@@ -103,8 +115,8 @@ function CreateModal(prop: Iprop) {
           <Button variant="secondary" onClick={() => handleClose()}>
             Close
           </Button>
-          <Button variant="primary" onClick={() => handleSubmit()}>
-            Save
+          <Button variant="warning" onClick={() => handleSubmit()}>
+            Update
           </Button>
         </Modal.Footer>
       </Modal>
@@ -112,4 +124,4 @@ function CreateModal(prop: Iprop) {
   );
 }
 
-export default CreateModal;
+export default UpdateModal;
